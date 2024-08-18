@@ -19,6 +19,11 @@ test('Test for New Window', async({browser})=>{
     
     const newPageTxt=newPage.locator("div[class='example'] h1")
     console.log(await newPageTxt.textContent())
+    console.log(await page.locator("li[class='breadcrumb-item'] a").textContent())
+  // await page.pause();
+    context.close();
+
+   
 
 
 })
