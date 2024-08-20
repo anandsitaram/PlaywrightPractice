@@ -1,0 +1,46 @@
+import { test, expect } from '@playwright/test';
+
+//command npx playwright codegen https://magento.softwaretestingboard.com/
+test('test', async ({ page }) => {
+  await page.goto('https://magento.softwaretestingboard.com/');
+  await page.getByRole('menuitem', { name: 'Tees' }).click();
+  await page.getByRole('link', { name: 'Logan HeatTec® Tee' }).first().click();
+  await page.getByLabel('S', { exact: true }).click();
+  await page.getByLabel('Blue').click();
+  await page.getByLabel('Qty').click();
+  await page.getByLabel('Qty').fill('5');
+  await page.getByRole('button', { name: 'Add to Cart' }).click();
+  await page.getByRole('link', { name: 'shopping cart' }).click();
+  await page.getByRole('tab', { name: 'Apply Discount Code ' }).click();
+  await page.getByRole('button', { name: 'Proceed to Checkout' }).click();
+  await page.getByRole('textbox', { name: 'Email Address * Email Address*' }).click();
+  await page.getByRole('textbox', { name: 'Email Address * Email Address*' }).click();
+  await page.getByRole('textbox', { name: 'Email Address * Email Address*' }).click();
+  await page.getByRole('textbox', { name: 'Email Address * Email Address*' }).fill('test@test.com');
+  await page.getByLabel('Table Rate').check();
+  await page.getByRole('button', { name: 'Next' }).click();
+  await page.getByLabel('First Name').fill('ass');
+  await page.getByLabel('Last Name').click();
+  await page.getByLabel('Last Name').fill('sdsdsdsds');
+  await page.getByLabel('Company').click();
+  await page.getByLabel('Company').fill('sdsdsd');
+  await page.getByLabel('Street Address: Line 1').fill('s');
+  await page.getByLabel('Street Address: Line 1').click();
+  await page.getByLabel('Street Address: Line 1').fill('sdsdsd');
+  await page.getByLabel('Street Address: Line 3').click();
+  await page.getByLabel('Street Address: Line 3').fill('sdsd');
+  await page.getByLabel('Street Address: Line 2').fill('s');
+  await page.getByLabel('Street Address: Line 2').click();
+  await page.getByLabel('Street Address: Line 2').fill('sdsd');
+  await page.getByLabel('City').click();
+  await page.getByLabel('City').fill('sdsd');
+  await page.locator('select[name="region_id"]').selectOption('14');
+  await page.getByLabel('Zip/Postal Code').click();
+  await page.getByLabel('Zip/Postal Code').fill('1212121');
+  await page.getByLabel('Phone Number').click();
+  await page.getByLabel('Phone Number').fill('852357951');
+  await page.getByRole('button', { name: 'Next' }).click();
+  await page.getByRole('button', { name: 'Place Order' }).click();
+  await page.getByText('000015139').click();
+  await expect(page.locator('#maincontent')).toContainText('Your order # is:.');
+});
