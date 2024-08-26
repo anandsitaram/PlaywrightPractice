@@ -32,8 +32,8 @@ export default defineConfig({
   
     browserName:'chromium',
     headless:false,
-    screenshot:'on',
-    trace:'on'
+    screenshot:'off',
+    trace:'off'
   },
 
   /* Configure projects for major browsers */
