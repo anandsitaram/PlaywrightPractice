@@ -3,8 +3,9 @@ const ApiUtils = require('./utils/ApiUtils');
 
 let token;
 test.beforeEach("Before All", async () => {
+   const payload= { userEmail: "qaatest@test.com", userPassword: "Test@123" }
     const newContext = await request.newContext();
-    const apiUtils=  new ApiUtils(newContext)
+    const apiUtils=  new ApiUtils(newContext,payload)
     token =await apiUtils.getToken();
 });
 
