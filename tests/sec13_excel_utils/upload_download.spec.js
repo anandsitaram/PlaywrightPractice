@@ -92,7 +92,7 @@ test.only("Upload and Download excel Validations",async({page})=>{
    console.log(path.resolve(downloadPath))
    await page.locator("#fileinput").setInputFiles(path.resolve(downloadPath))
    await page.waitForLoadState('domcontentloaded')
-   await page.screenshot({path:'screenshot.png'})
+   await page.screenshot({path:'tests/sec13_excel_utils/screenshot.png'})
    const desriredRow= page.getByRole('row').filter({hasText:textSearch});
    await expect( desriredRow.locator('#cell-4-undefined')).toContainText(valueToBeUpdated)
    
