@@ -1,52 +1,36 @@
 import { test, expect } from "@playwright/test";
 const {HomePage}= require('./HomePage')
+const {ProductListPage} =require('./ProductListPage')
+const {ProductDetailPage} =require('./ProductDetailPage')
+
 test("New User", async ({ browser }) => {
     const product = "Rocco Gym Tank";
     const qty = "3";
     const context = await browser.newContext();
     const page = await context.newPage();
+
     const homePage=new HomePage(page);
     await homePage.goTo();
     await homePage.navigateToTanksPage();
-    await page.locator("strong[class*='product name'] [class='product-item-link']")
-    .filter({hasText:product}).click()
-    // const allProducts = page.locator(
-    //     "strong[class*='product name'] [class='product-item-link']"
-    // );
+
+    const productListPage= new ProductListPage(page)
+    await productListPage.clickOnProduct(product)
+
+    const productDetailPage= new ProductDetailPage(page)
+
+    expect(await productDetailPage.getProductName()).toBe(product);
+    expect(await productDetailPage.getProductPrice()).toBeTruthy();
+
+    await productDetailPage.selectProductSize("XS")
+    await productDetailPage.selectProductColor("Blue")
+    await productDetailPage.selectQty(qty)
+    await productDetailPage.addTheProduct()
+    await productDetailPage.waitForCountNumber()
+
  
-    // const productsCount = await allProducts.count();
-    // expect(productsCount).toBeGreaterThan(0);
- 
-    // for (let i = 0; i < productsCount; i++) {
-    //     let text = await allProducts.nth(i).textContent();
-    //     text = text.trim();
-    //     if (text === product) {
-    //         await allProducts.nth(i).click();
-    //         break;
-    //     }
-    // }
- 
-    await expect(page.locator("h1[class='page-title'] span")).toHaveText(product);
- 
-    expect(
-        await page
-            .locator("div[class='product-info-price'] >>span[class='price']")
-            .textContent()
-    ).toBeTruthy();
-    await page.locator("div[option-label='XS']").click();
- 
-    await page.locator("div[option-label='Blue']").click();
- 
-    await page.locator("#qty").fill(qty);
- 
-    await page.locator("#product-addtocart-button").click();
- 
-    await page.waitForSelector(".counter-number");
  
     await page.locator("a[class*='showcart']").click();
-    await expect(
-        page.locator("button[id*='top-cart-btn-checkout']")
-    ).toBeAttached();
+    await expect(page.locator("button[id*='top-cart-btn-checkout']")).toBeAttached();
     await page.waitForTimeout(2000);
     await page.locator("button[id*='top-cart-btn-checkout']").click();
  
