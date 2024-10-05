@@ -1,7 +1,13 @@
 import { test, expect } from "@playwright/test";
-const {HomePage}= require('./HomePage')
-const {ProductListPage} =require('./ProductListPage')
-const {ProductDetailPage} =require('./ProductDetailPage')
+const { HomePage } = require('./HomePage');
+const { ProductListPage } = require('./ProductListPage');
+const { ProductDetailPage } = require('./ProductDetailPage');
+const { MenuPage } = require('./MenuPage');
+const { CheckoutPage } = require('./CheckoutPage');
+const { ReviewPage } = require('./ReviewPage');
+const { OrderSuccessPage } = require('./OrderSuccessPage');
+const DateUtils = require('./utils/DateUtils');
+const RandomUtils = require('./utils/RandomUtils');
 
 test("New User", async ({ browser }) => {
     const product = "Rocco Gym Tank";
@@ -9,73 +15,64 @@ test("New User", async ({ browser }) => {
     const context = await browser.newContext();
     const page = await context.newPage();
 
-    const homePage=new HomePage(page);
+    const homePage = new HomePage(page);
     await homePage.goTo();
-    await homePage.navigateToTanksPage();
+    await homePage.mouseHoverOnMainMenu('Men');
+    await homePage.mouseHoverOnSubMenu('Tops', 'Tanks');
 
-    const productListPage= new ProductListPage(page)
-    await productListPage.clickOnProduct(product)
+    const productListPage = new ProductListPage(page);
+    await productListPage.clickOnProduct(product);
 
-    const productDetailPage= new ProductDetailPage(page)
-
+    const productDetailPage = new ProductDetailPage(page);
     expect(await productDetailPage.getProductName()).toBe(product);
     expect(await productDetailPage.getProductPrice()).toBeTruthy();
 
-    await productDetailPage.selectProductSize("XS")
-    await productDetailPage.selectProductColor("Blue")
-    await productDetailPage.selectQty(qty)
-    await productDetailPage.addTheProduct()
-    await productDetailPage.waitForCountNumber()
+    await productDetailPage.selectProductSize("XS");
+    await productDetailPage.selectProductColor("Blue");
+    await productDetailPage.selectQty(qty);
+    await productDetailPage.addTheProduct();
+    await productDetailPage.waitForCountNumber();
 
- 
- 
-    await page.locator("a[class*='showcart']").click();
-    await expect(page.locator("button[id*='top-cart-btn-checkout']")).toBeAttached();
-    await page.waitForTimeout(2000);
-    await page.locator("button[id*='top-cart-btn-checkout']").click();
- 
-    //**********Checkout Screen **************/
-    //console.log(Math.floor((Math.random()*100)+10))
- 
-    await expect(
-        page
-            .locator("//*[text()='Order Summary']/following-sibling::div//div")
-            .last()
-    ).toBeAttached();
-    const randomData = new Date().getMilliseconds();
- 
-    await page
-        .locator("div[class*='control _with-tooltip'] input[id='customer-email']")
-        .fill("test" + randomData + "@test.com");
-    await page.locator("[name='firstname']").fill("QA" + randomData);
-    await page.locator("[name='lastname']").fill("Test" + randomData);
-    await page.locator("[name='street[0]']").fill("6789 N willi");
-    await page.locator("[name='city']").fill("Portland");
-    await page.locator("[name='region_id']").selectOption("Oregon");
-    await page.locator("[name='postcode']").fill("986451");
-    await page.locator("[name='telephone']").fill("1231231231");
-    await page.locator("[value='flatrate_flatrate']").click();
-    await page.locator("[class*='button action continue primary']").click();
- 
-    /********Review ********/
-    await expect(page.locator("//*[text()='Payment Method']")).toBeAttached();
-    //await page.waitForSelector("//*[text()='Payment Method']");
-    await expect(
-        page.locator("//div[@class='details-qty']//span[@class='value']")
-    ).toHaveText(qty);
-    await expect(page.locator(".product-item-name")).toHaveText(product);
-    await page.locator("[class*='action primary checkout']").click();
- 
-    /********Thank you for your purchase! ********/
-    await expect(
-        page.locator("//*[text()='Thank you for your purchase!']")
-    ).toBeAttached();
-    const orderNo = await page
-        .locator("div[class='checkout-success'] p span")
-        .textContent();
-    console.log(`the order number is ${orderNo}`);
+    const menuPage = new MenuPage(page);
+    await menuPage.openCart();
+    await menuPage.waitForCheckoutButton();
+    await menuPage.clickCheckoutButton();
+
+    // Checkout Screen
+    const checkoutPage = new CheckoutPage(page);
+    await checkoutPage.waitTillPageLoaded();
+
+    const currentDate = DateUtils.getCurrentDate();
+    const addressData = {
+        email: "test" + currentDate + "@test.com",
+        firstName: "AutoQA",
+        lastName: RandomUtils.getRandomLowerCaseString(3),
+        streetAddress: "6789 N Willi",
+        city: "Portland",
+        region: "Oregon",
+        postCode: "986451",
+        mobileNo: "1231231231",
+        shippingMethod: "flatrate"  // or "tablerate"
+    };
+
+    await checkoutPage.fillCheckoutForm(addressData);
+    await checkoutPage.clickContinue();
+
+    // Review
+    const reviewPage = new ReviewPage(page);
+    await reviewPage.waitTillPageLoaded();
+
+    // Using expect(locator).toHaveText(expected)
+    await expect(reviewPage.qtyTxt).toHaveText(qty);
+    await expect(reviewPage.productNameTxt).toHaveText(product);
+    
+    await reviewPage.clickOnPlaceOrderBtn();
+
+    // Thank you for your purchase!
+    const orderSuccessPage = new OrderSuccessPage(page);
+    await orderSuccessPage.waitTillPageLoaded();
+
+    const orderNo = await orderSuccessPage.getOrderNo();
+    console.log(`The order number is ${orderNo}`);
     expect(orderNo).toBeTruthy();
-    //console.log(await page.locator("//div[@class='checkout-success']/p/span").textContent())
-    //await page.pause()
 });
- 

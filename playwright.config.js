@@ -31,7 +31,7 @@ export default defineConfig({
   
     browserName:'chromium',
     headless:false,
-    screenshot:'off',
+    screenshot:'on',
     trace:'off',
     launchOptions: {
       // 1

@@ -1,32 +1,18 @@
-class ProductListPage{
-
-    constructor(page){
-        this.page=page;
+class ProductListPage {
+    constructor(page) {
+        this.page = page;
     }
 
-    async clickOnProduct(productName){
-        await this.page.locator("strong[class*='product name'] [class='product-item-link']")
-        .filter({hasText:productName}).click()
+    // Method to click on a product by its name
+    async clickOnProduct(productName) {
+      const specificProduct = this.page.locator("strong[class*='product name'] [class='product-item-link']").filter({ hasText: productName });
 
-        
-    // const allProducts = page.locator(
-    //     "strong[class*='product name'] [class='product-item-link']"
-    // );
- 
-    // const productsCount = await allProducts.count();
-    // expect(productsCount).toBeGreaterThan(0);
- 
-    // for (let i = 0; i < productsCount; i++) {
-    //     let text = await allProducts.nth(i).textContent();
-    //     text = text.trim();
-    //     if (text === product) {
-    //         await allProducts.nth(i).click();
-    //         break;
-    //     }
-    // }
+      // Wait for the specific product to be visible
+      await specificProduct.waitFor({ state: 'visible' });
+
+      // Click on the specific product
+      await specificProduct.click();
     }
-
-
 }
 
-module.exports={ProductListPage}
+module.exports = { ProductListPage };
